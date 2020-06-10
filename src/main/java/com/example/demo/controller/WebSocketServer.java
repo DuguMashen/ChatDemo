@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.example.demo.model.User;
 import com.example.demo.model.UserRepository;
 import com.example.demo.model.WsMessage;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +16,7 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -92,6 +94,13 @@ public class WebSocketServer {
         log.error("连接错误:{},message:{}", this.userId, error.getMessage());
     }
 
+    /**
+     * 实现服务器主动推送
+     */
+    public void sendMessage(String message) throws IOException {
+        this.session.getBasicRemote().sendText(message);
+    }
+
     public static void sendMessage(WsMessage message) {
         String toUserId = message.getToUserId();
         try {
@@ -102,15 +111,30 @@ public class WebSocketServer {
     }
 
     /**
+     * 发送自定义消息
+     */
+    public static void sendInfo(String message, @PathParam("userId") String userId) throws IOException {
+        log.info("发送消息到:" + userId + "，报文:" + message);
+        if (StringUtils.isNotBlank(userId) && sessions.contains(userId)) {
+            sendMessage(userId, message);
+        } else {
+            log.error("用户" + userId + ",不在线！");
+        }
+    }
+
+    /**
      * 向指定用户发送消息
      */
     public static void sendMessage(String userId, String message) throws IOException {
         sessions.get(userId).getBasicRemote().sendText(message);
     }
 
-    public static void setUserRepository(UserRepository userRepository){
-        WebSocketServer.userRepository=userRepository;
+    public static void setUserRepository(UserRepository userRepository) {
+        WebSocketServer.userRepository = userRepository;
     }
 
+    public static List<User> memberList() {
+        return userRepository.getUsers();
+    }
 
 }

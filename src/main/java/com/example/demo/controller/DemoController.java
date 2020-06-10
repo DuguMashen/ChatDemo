@@ -32,21 +32,14 @@ public class DemoController {
 
     @RequestMapping("/push/{toUserId}")
     public ResponseEntity<String> pushToWeb(String message, @PathVariable String toUserId) throws IOException {
-        //WebSocketServer.sendInfo(message, toUserId);
+        WebSocketServer.sendInfo(message, toUserId);
         return ResponseEntity.ok("MSG SEND SUCCESS");
     }
 
     @RequestMapping("/memberList")
     public List<?> memberList() {
-        /*ConcurrentHashMap<String, WebSocketServer> map = WebSocketServer.memberList();
-        ArrayList<String> list = new ArrayList<>();
-        for (Iterator<String> iterator = map.keySet().iterator();iterator.hasNext();) {
-            String key = (String) iterator.next();
-            list.add(key);
-
-        }
-*/
-        return null;
+        List<User> users = WebSocketServer.memberList();
+        return users;
     }
 
     @RequestMapping("/login")
