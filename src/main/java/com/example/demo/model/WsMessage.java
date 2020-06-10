@@ -12,7 +12,12 @@ public class WsMessage {
     private Map map;
     private String time;
 
+
     public enum TypeEnum {
+        /**
+         * 用户消息
+         */
+        USERLIST("userlist","用户列表"),
         CLIENT("client", "客户消息");
         private String type;
         private String desc;

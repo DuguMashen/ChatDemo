@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -49,12 +50,7 @@ public class WebSocketServer {
         this.session = session;
         this.userId = userId;
         sessions.put(userId, session);
-        //推送用户列表
-        WsMessage wsMessage = new WsMessage();
-        Map map = new HashMap<>();
-        map.put("users", userRepository);
-        wsMessage.setMap(map);
-        sendMessage(wsMessage);
+        pustUserList();
         log.info("用户连接:{}", userId);
 
     }
@@ -67,9 +63,11 @@ public class WebSocketServer {
         try {
             session.close();
             sessions.remove(userId);
+
         } catch (IOException e) {
             log.error("exception:{}", e.getMessage());
         }
+        pustUserList();
         log.info("用户退出:{}", userId);
     }
 
@@ -102,13 +100,36 @@ public class WebSocketServer {
     }
 
     public static void sendMessage(WsMessage message) {
-        String toUserId = message.getToUserId();
-        try {
+        String type = message.getType();
+        if (StringUtils.isBlank(type)) {
+            log.error("消息类型为空");
+            //消息类型为空，发给所有用户
+            notice(message);
+            return;
+        }
+        if (WsMessage.TypeEnum.USERLIST.getType().equals(type)) {
+            notice(message);
+            return;
+        }
+        if (WsMessage.TypeEnum.CLIENT.getType().equals(type)) {
+            String toUserId = message.getToUserId();
+            if (StringUtils.isBlank(toUserId)) {
+                log.error("消息接收者为空");
+                return;
+            }
             sendMessage(toUserId, JSON.toJSONString(message));
-        } catch (IOException e) {
-            log.error("发送消息异常:{}", e.getMessage());
+            return;
+        }
+
+    }
+
+    public static void notice(WsMessage message) {
+        Set<String> set = sessions.keySet();
+        for (String userId : set) {
+            sendMessage(userId, JSONObject.toJSONString(message));
         }
     }
+
 
     /**
      * 发送自定义消息
@@ -125,8 +146,22 @@ public class WebSocketServer {
     /**
      * 向指定用户发送消息
      */
-    public static void sendMessage(String userId, String message) throws IOException {
-        sessions.get(userId).getBasicRemote().sendText(message);
+    public static void sendMessage(String userId, String message) {
+        try {
+            sessions.get(userId).getBasicRemote().sendText(message);
+        } catch (IOException e) {
+            log.error("发送消息异常:{}", e.getMessage());
+        }
+    }
+
+    public static void pustUserList() {
+        //推送用户列表
+        WsMessage wsMessage = new WsMessage();
+        wsMessage.setType(WsMessage.TypeEnum.USERLIST.getType());
+        Map map = new HashMap<>();
+        map.put("users", userRepository);
+        wsMessage.setMap(map);
+        notice(wsMessage);
     }
 
     public static void setUserRepository(UserRepository userRepository) {
