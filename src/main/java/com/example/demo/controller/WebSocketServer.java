@@ -2,9 +2,11 @@ package com.example.demo.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.example.demo.model.MessageRepository;
 import com.example.demo.model.User;
 import com.example.demo.model.UserRepository;
 import com.example.demo.model.WsMessage;
+import com.example.demo.service.AsyncService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
@@ -29,10 +31,12 @@ public class WebSocketServer {
     static Logger log = LoggerFactory.getLogger(WebSocketServer.class);
 
     /**
-     * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
+     * 保存用户会话
      */
     private static ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<>();
     private static UserRepository userRepository;
+    private static MessageRepository messageRepository;
+    private static AsyncService asyncService;
     /**
      * 与某个客户端的连接会话，需要通过它来给客户端发送数据
      */
@@ -78,8 +82,9 @@ public class WebSocketServer {
      * @param message 客户端发送过来的消息
      */
     @OnMessage
-    public void onMessage(String message, Session session) {
+    public void onMessage(String message) {
         WsMessage msg = JSONObject.parseObject(message, WsMessage.class);
+        asyncService.saveMessage(msg);
         sendMessage(msg);
     }
 
@@ -99,12 +104,15 @@ public class WebSocketServer {
         this.session.getBasicRemote().sendText(message);
     }
 
+    /**
+     * 发送消息
+     *
+     * @param message
+     */
     public static void sendMessage(WsMessage message) {
         String type = message.getType();
         if (StringUtils.isBlank(type)) {
             log.error("消息类型为空");
-            //消息类型为空，发给所有用户
-            notice(message);
             return;
         }
         if (WsMessage.TypeEnum.USERLIST.getType().equals(type)) {
@@ -118,11 +126,14 @@ public class WebSocketServer {
                 return;
             }
             sendMessage(toUserId, JSON.toJSONString(message));
-            return;
         }
 
     }
 
+    /**
+     * 通知消息，群发用户
+     * @param message
+     */
     public static void notice(WsMessage message) {
         Set<String> set = sessions.keySet();
         for (String userId : set) {
@@ -148,7 +159,12 @@ public class WebSocketServer {
      */
     public static void sendMessage(String userId, String message) {
         try {
-            sessions.get(userId).getBasicRemote().sendText(message);
+            Session session=sessions.get(userId);
+            if(session==null){
+                // TODO 用户离线，保存离线消息
+                return;
+            }
+            session.getBasicRemote().sendText(message);
         } catch (IOException e) {
             log.error("发送消息异常:{}", e.getMessage());
         }
