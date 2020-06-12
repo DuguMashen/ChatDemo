@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎</title>
+</head>
+<script src="../static/jquery-3.4.1.min.js"></script>
+<script src="../static/chat.js"></script>
+<link rel="stylesheet" href="../static/chat.css" type="text/css" />
+<style>
+
+
+    .head {
+        width: 500px;
+    }
+
+    input {
+        display: inline-block;
+    }
+
+    .a {
+
+        text-align: left;
+        width: 360px;
+        margin-top: 5px;
+        float: left;
+        clear: both
+
+
+    }
+
+
+    .b {
+
+        text-align: right;
+        width: 360px;
+        margin-top: 5px;
+        float: right;
+        clear: both;
+
+    }
+
+    .c {
+        padding: 7px;
+        display: inline-block;
+        border: 1px solid lightgrey;
+        background-color: aliceblue;
+    }
+
+    .d {
+        text-align: left;
+        padding: 7px;
+        display: inline-block;
+        border: 1px solid lightgrey;
+        background-color: antiquewhite;
+
+    }
+
+    img {
+        border-radius: 50%;
+        float: right;
+    }
+
+    #context, #nav {
+        border: 1px skyblue dashed;
+        display: inline-block;
+        float: left;
+    }
+
+    .messageText {
+        width: 100%;
+        height: 30px;
+        outline: none
+    }
+
+    .navLeft {
+        width: 90%;
+        border-bottom: 1px solid gainsboro;
+        height: 40px;
+        margin: 0;
+        margin-left: 5%;
+        font-size: 14px;
+    }
+
+    .fasong {
+        color: lightgrey;
+        position: absolute;
+        right: 2px;
+        bottom: 2px;
+    }
+
+
+</style>
+
+<script>
+    var url = "http://192.168.43.48:8080/"
+    $(function () {
+        //刷新在线人数
+        $.post(
+            url + "memberList",
+            function (result) {
+                for (var obj in result) {
+                    var list = '<p class="navLeft" id="navLift"+obj>' + result[obj] + '</p>';
+                    $("#nav").append(list);
+                }
+
+            }
+        );
+    })
+
+    function aclick() {
+        var leftName = document.getElementById("aname").value
+        var body = document.getElementById("context");
+        var div = document.createElement("div");
+        div.className = "a";
+        var left = '<span class=c>' + leftName + '</span>'
+        div.innerHTML = left;
+
+        body.appendChild(div);
+
+        body.scrollTop = body.scrollHeight;
+
+    }
+
+    function bclick(Mymessage) {
+        var rightName = Mymessage;
+        var body = document.getElementById("message");
+        var div = document.createElement("div");
+        div.className = "b";
+        var right = '<span class=d>' + rightName + '</span><img src="../static/wrr.jpg" width="40px;" height="40px;" onclick="bigsize()">'
+        div.innerHTML = right;
+        body.appendChild(div);
+        body.scrollTop = body.scrollHeight;
+    }
+
+    function sendMessage() {
+        if (typeof (WebSocket) == "undefined") {
+            console.log("您的浏览器不支持WebSocket");
+        } else {
+            console.log("您的浏览器支持WebSocket");
+            //console.log('{"toUserId":"'+$("#toUserId").val()+'","contentText":"'+$("#contentText").val()+'"}');
+            // socket.send('{"toUserId":"'+$("#toUserId").val()+'","contentText":"'+$("#contentText").val()+'"}');
+            bclick($("#messageText").text());
+        }
+    }
+
+
+</script>
+<body>
+
+<div style="width:1000px; margin: 0 auto; height: 500px;">
+    <div id="nav" style="width: 20%;height:500px;overflow: auto"></div>
+    <div id="context" style="width: 70%; height: 500px; ">
+        <div id="message"
+             style="width: 100%;height:430px;overflow: auto;float: left;border-bottom: 1px solid lightgrey;">
+            <div class="msgleft">
+                <div class="head headleft">
+                    <img src="../static/wrr.jpg" height="30px" width="30px"/>
+                </div>
+                <div class="content conleft">
+                    这是消息
+                </div>
+            </div>
+        </div>
+        <div id="tj" style="clear:both;width: 100%;height:70px;position: relative;">
+            <div contenteditable="true" class="messageText" id="messageText">
+
+            </div>
+            <span class="fasong" onclick="sendMessage()">发送</span>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>

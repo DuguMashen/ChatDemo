@@ -33,7 +33,7 @@ public class WebSocketServer {
     /**
      * 保存用户会话
      */
-    private static ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<>();
     private static UserRepository userRepository;
     private static MessageRepository messageRepository;
     private static AsyncService asyncService;
@@ -182,6 +182,10 @@ public class WebSocketServer {
 
     public static void setUserRepository(UserRepository userRepository) {
         WebSocketServer.userRepository = userRepository;
+    }
+
+    public static void setAsyncService(AsyncService asyncService) {
+        WebSocketServer.asyncService = asyncService;
     }
 
     public static List<User> memberList() {

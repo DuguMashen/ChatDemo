@@ -1,0 +1,22 @@
+.msgContainer {
+    width: 60%;
+}
+
+.content {
+    display: inline-block;
+}
+
+.head {
+    display: inline-block;
+}
+
+.headleft {
+    float: left;
+}
+.conleft{
+    float: right;
+}
+
+.headright {
+    float: right;
+}

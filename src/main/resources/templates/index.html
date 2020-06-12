@@ -1,146 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
-    <title>欢迎</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>vue</title>
+    <style>
+        *, *:before, *:after {
+            box-sizing: border-box;
+        }
+        body, html {
+            height: 100%;
+            overflow: hidden;
+        }
+        body, ul {
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            color: #4d4d4d;
+            font: 14px/1.4em 'Helvetica Neue', Helvetica, 'Microsoft Yahei', Arial, sans-serif;
+            background: #f5f5f5 url('dist/images/bg.jpg') no-repeat center;
+            background-size: cover;
+            font-smoothing: antialiased;
+        }
+        ul {
+            list-style: none;
+        }
+        #chat {
+            margin: 20px auto;
+            width: 800px;
+        	height: 600px;
+        }
+    </style>
 </head>
-<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
-<style>
-
-
-    .head {
-        width: 500px;
-    }
-
-    input {
-        display: inline-block;
-    }
-
-    .a {
-
-        text-align: left;
-        width: 350px;
-        margin-top: 5px;
-        float: left;
-        clear:both
-
-
-    }
-
-
-    .b {
-
-        text-align: right;
-        width: 350px;
-        margin-top: 5px;
-        float: right;
-        clear: both;
-
-    }
-
-    .c {
-        padding: 7px;
-        display: inline-block;
-        border: 1px solid lightgrey;
-        background-color: aliceblue;
-    }
-
-    .d {
-        text-align: left;
-        padding: 7px;
-        display: inline-block;
-        border: 1px solid lightgrey;
-        background-color: antiquewhite;
-
-    }
-
-    img {
-        border-radius: 50%;
-        float: right;
-    }
-
-    #context, #nav {
-        border: 1px skyblue dashed;
-        display: inline-block;
-    }
-
-
-    .navLeft{
-        width:90%;
-        border-bottom: 1px solid gainsboro;
-        height: 40px;
-        margin:0;
-        margin-left: 5%;
-        font-size:14px;
-    }
-    .fasong{
-
-    }
-
-
-</style>
-
-<script>
-    var url = "http://192.168.43.48:8080/"
-    $(function () {
-        //刷新在线人数
-        $.post(
-            url + "memberList",
-            function (result) {
-                for (var obj in result) {
-                    var list = '<p class="navLeft" id="navLift"+obj>' + result[obj] + '</p>';
-                    $("#nav").append(list);
-                }
-
-            }
-        );
-    })
-
-    function aclick() {
-        var leftName = document.getElementById("aname").value
-        var body = document.getElementById("context");
-        var div = document.createElement("div");
-        div.className = "a";
-        var left = '<span class=c>' + leftName + '</span>'
-        div.innerHTML = left;
-
-        body.appendChild(div);
-
-        body.scrollTop = body.scrollHeight;
-
-    }
-
-    function bclick() {
-        var rightName = document.getElementById("bname").value;
-        var body = document.getElementById("context");
-        var div = document.createElement("div");
-        div.className = "b";
-        var right = '<span class=d>' + rightName + '</span><img src="../static/wrr.jpg" width="40px;" height="40px;" onclick="bigsize()">'
-        div.innerHTML = right;
-        body.appendChild(div);
-        body.scrollTop = body.scrollHeight;
-    }
-
-
-</script>
 <body>
 
-<div>
-    我： <input type="text" id="aname"> <input type="submit" value="提交" onclick="aclick()">
-</div>
-
-<div>
-    你： <input type="text" id="bname"> <input type="submit" value="提交" onclick="bclick()">
-</div>
-<div style="width:1000px; margin: 0 auto; height: 500px;">
-    <div id="nav" style="width: 20%;height:500px;overflow: auto"></div>
-    <div id="context" style="width: 70%; height: 500px; ">
-        <div id="message" style="width: 100%;height:430px;overflow: auto;float: left;border-bottom: 1px solid lightgrey"></div>
-        <div id="tj" style="width: 100%;height:70px; float: left">
-            <span class="fasong">发送</span>
-        </div>
-    </div>
-</div>
+<div id="chat"></div>
+<script src="dist/vue.js"></script>
+<script src="dist/main.js"></script>
 
 
 </body>

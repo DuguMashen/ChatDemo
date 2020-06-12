@@ -3,6 +3,7 @@ package com.example.demo;
 
 import com.example.demo.controller.WebSocketServer;
 import com.example.demo.model.UserRepository;
+import com.example.demo.service.AsyncService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -19,6 +20,8 @@ public class DemoApplication {
         ApplicationContext applicationContext = springApplication.run(args);
         UserRepository userRepository = applicationContext.getBean(UserRepository.class);
         WebSocketServer.setUserRepository(userRepository);
+        AsyncService asyncService = applicationContext.getBean(AsyncService.class);
+        WebSocketServer.setAsyncService(asyncService);
     }
 
 }
